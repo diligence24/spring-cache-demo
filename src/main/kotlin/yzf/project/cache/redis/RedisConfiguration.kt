@@ -18,6 +18,7 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
+import yzf.project.cache.constants.RedisCacheNames
 
 /**
  * @author created by yzf on 29/01/2018
@@ -69,7 +70,13 @@ open class RedisConfiguration : CachingConfigurerSupport() {
 
     @Bean
     open fun cacheManager(redisTemplate: RedisTemplate<String, String>): CacheManager {
-        return RedisCacheManager(redisTemplate)
+        val redisCacheManager = RedisCacheManager(redisTemplate)
+        val cacheNameAndTTL = mutableMapOf<String, Long>()
+        cacheNameAndTTL[RedisCacheNames.PERSON_ID] = 10
+        cacheNameAndTTL[RedisCacheNames.PERSON_NAME] = 20
+        redisCacheManager.setExpires(cacheNameAndTTL)
+        redisCacheManager.afterPropertiesSet()
+        return redisCacheManager
     }
 
     /**
